@@ -91,7 +91,7 @@ const Personalinfo = () => {
             <div className="flex gap-2 items-center md:justify-end justify-center mt-8">
                 <div
                     onClick={() => navigate(`/settings/personal-info/edit`)}
-                    className="w-48 !bg-[#038c6d] !text-white py-3 px-6 rounded-lg cursor-pointer flex justify-center items-center gap-2"
+                    className="w-48 !bg-primary !text-white py-3 px-6 rounded-lg cursor-pointer flex justify-center items-center gap-2"
                 >
                     <FaEdit size={17} />
                     <p>Edit Profile</p>

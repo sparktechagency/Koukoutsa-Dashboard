@@ -5,15 +5,10 @@ import { useGetDashboardStatusQuery } from "../../../redux/features/dashboard/da
 import { useBlockUserMutation, useUnBlockUserMutation } from "../../../redux/features/user/userApi";
 
 const RecentTransactions = () => {
-  const [searchText, setSearchText] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); // Track the current page
   const [pageSize, setPageSize] = useState(6); // Items per page
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); // Store selected user details
-
-  const { data: userData, isLoading } = useGetDashboardStatusQuery();
-  const recentUsers = userData?.recentUsers.slice(0, 8);
 
   const [userBlock] = useBlockUserMutation();
   const [userUnBlock] = useUnBlockUserMutation();
@@ -100,29 +95,28 @@ const RecentTransactions = () => {
     },
   ];
 
-  const filteredData = recentUsers?.filter((user) => {
-    const matchesText =
-      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchText.toLowerCase());
-    const matchesDate = selectedDate
-      ? user.date === selectedDate.format("YYYY-MM-DD")
-      : true;
+  // Assuming 'recentUsers' is available in your component context (e.g., from API data or state)
+  const recentUsers = [
+    // Add your raw data here
+    // Example:
+    { id: 1, fullName: "John Doe", email: "john@example.com", role: "Admin", createdAt: "2025-05-12" },
+    { id: 2, fullName: "Jane Smith", email: "jane@example.com", role: "User", createdAt: "2025-05-11" },
+    // More users...
+  ];
 
-    return matchesText && matchesDate;
-  });
-
-  // Paginate the filtered data
-  const paginatedData = filteredData?.slice(
+  // Paginate the raw data
+  const paginatedData = recentUsers.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  const dataSource = paginatedData?.map((user, index) => ({
+  const dataSource = paginatedData.map((user, index) => ({
     key: user.id,
     si: (currentPage - 1) * pageSize + index + 1, // Correct the serial number based on page
-    userName: `${user?.fullName}`,
+    userName: user.fullName,
     email: user.email,
     role: user.role,
-    joinDate: user.createdAt.split(",")[0],
+    joinDate: user.createdAt.split(",")[0], // Adjust based on your date format
   }));
 
   return (
@@ -136,8 +130,8 @@ const RecentTransactions = () => {
         theme={{
           components: {
             Table: {
-              headerBg: "#92b8c0",
-              headerColor: "#000",
+              headerBg: "#ffd400",
+              headerColor: "#fff",
               headerBorderRadius: 5,
             },
           },
@@ -157,7 +151,7 @@ const RecentTransactions = () => {
         <Pagination
           current={currentPage}
           pageSize={pageSize}
-          total={filteredData?.length}
+          total={recentUsers?.length} // Total is based on the raw data
           onChange={(page, pageSize) => {
             setCurrentPage(page);
             setPageSize(pageSize);
@@ -169,12 +163,7 @@ const RecentTransactions = () => {
       </div>
 
       {/* User Details Modal */}
-      <Modal
-        // title="User Details"
-        open={isModalVisible}
-        onCancel={handleCancel}
-        footer={[]}
-      >
+      <Modal open={isModalVisible} onCancel={handleCancel} footer={[]}>
         {selectedUser && (
           <div>
             <h2 className="text-2xl font-semibold text-center mb-10">User Details</h2>

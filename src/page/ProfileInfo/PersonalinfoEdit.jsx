@@ -134,7 +134,7 @@ const PersonalinfoEdit = () => {
 
                     {/* ✅ Save Changes Button */}
                     <div className="flex sm:justify-end justify-center items-center mt-8">
-                        <Button htmlType="submit" className="h-14 md:px-20 !bg-[#038c6d] !text-white rounded-lg text-lg font-medium">
+                        <Button htmlType="submit" className="h-14 md:px-20 !bg-primary !text-white rounded-lg text-lg font-medium">
                             Save Changes
                         </Button>
                     </div>

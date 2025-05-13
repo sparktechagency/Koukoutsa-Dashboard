@@ -3,20 +3,68 @@ import { useState } from "react";
 import { FaAngleLeft } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Link } from "react-router-dom";
-import { useGetAllNotificationQuery } from "../../../redux/features/setting/settingApi";
 import moment from "moment";
 
 const Notification = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: allNotification } = useGetAllNotificationQuery();
-  console.log(allNotification?.notifications);
+  // Static notifications data
+  const allNotification = {
+    notifications: [
+      {
+        id: 1,
+        message: "Your profile has been updated successfully.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        message: "New comment on your post.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 3,
+        message: "You have a new follower.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 4,
+        message: "Password changed successfully.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 5,
+        message: "You received a new message.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 6,
+        message: "Account settings updated.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 7,
+        message: "New blog post published.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 8,
+        message: "You have new notifications.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 9,
+        message: "Updated privacy policy.",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 10,
+        message: "New update available for your app.",
+        createdAt: new Date().toISOString(),
+      },
+    ],
+  };
 
-
-  // Sample data
-
-
-  const pageSize = 10;
+  const pageSize = 5;
 
   // Pagination Logic
   const paginatedNotifications = allNotification?.notifications.slice(
@@ -28,15 +76,28 @@ const Notification = () => {
     setCurrentPage(page);
   };
 
+
+  const handleShowToast = () => {
+
+
+  };
+
+
   return (
     <div className="p-4">
-      <Link to={"/"} className="text-2xl flex items-center mb-4"><FaAngleLeft /> Notification</Link>
+      <Link to={"/"} className="text-2xl flex items-center mb-4">
+        <FaAngleLeft /> Notification
+      </Link>
 
       <div className="space-y-4">
         {paginatedNotifications?.map((item) => (
-          <div key={item.id} className="border border-[#84df91] hover:bg-[#84df9256] cursor-pointer rounded-md p-4 flex items-center space-x-4">
-            <div className="text-[#84df91] border border-[#84df91] rounded-full p-2">
-              <span className=" bg-[#84df91] p-1.5 rounded-full absolute ml-4 z-20"></span>
+          <div
+            onClick={handleShowToast}
+            key={item.id}
+            className="border border-primary hover:bg-[#ffd50028] cursor-pointer rounded-md p-4 flex items-center space-x-4"
+          >
+            <div className="text-primary border border-primary rounded-full p-2">
+              <span className=" bg-primary p-1.5 rounded-full absolute ml-4 z-20"></span>
               <IoMdNotificationsOutline size={30} className="relative" />
             </div>
             <div>

@@ -1,35 +1,44 @@
 import { FaDatabase } from "react-icons/fa";
 import { PiCurrencyCircleDollar, PiUsers, PiUsersThreeFill } from "react-icons/pi";
 import { useGetDashboardStatusQuery } from "../../../redux/features/dashboard/dashboardApi";
+import { MdWavingHand } from "react-icons/md";
+import { BsCardChecklist } from "react-icons/bs";
+import { CiMoneyCheck1 } from "react-icons/ci";
+
 const Status = () => {
   const { data, isLoading } = useGetDashboardStatusQuery();
 
-
-
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-5">
-      <div className="flex justify-between items-center p-5 rounded-lg border-2 border-gray-200">
-        <div className="size-20 p-3 flex justify-center items-center rounded-full bg-[#002831] text-white  ">
-          <PiUsersThreeFill className="size-10" />
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div className=" p-5 rounded-lg bg-yellow-100 border-2 border-yellow-300">
+        <div className=" gap-2 flex items-center">
+          <div className="rounded-lg bg-yellow-500 text-white p-3">
+            <BsCardChecklist className="text-4xl" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-700">Total User</h3>
         </div>
-        <div className="space-y-2">
-          <h1 className="text-center text-4xl font-semibold text-[#222222]">
-            {data?.totalNumberOfUser || "0"}
-          </h1>
-          <h1>Total User</h1>
-        </div>
-      </div>
-      <div className="flex justify-between items-center p-5 rounded-lg border-2 border-gray-200">
-        <div className="size-20 p-3 flex justify-center items-center rounded-full bg-[#002831] text-white   ">
-          <PiCurrencyCircleDollar className="size-10" />
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-center text-4xl font-semibold text-[#222222]">
-            ${data?.totalAmountOfEarnings?.amount || "0"}
-          </h1>
-          <h1>Total Donation </h1>
+        <div className="space-y-2 flex items-center gap-2 mt-3">
+          <h1 className="text-4xl font-semibold text-gray-800">{data?.totalNumberOfUser || "100"}</h1>
+          <h1 className="text-sm text-gray-500">Last month total 1050</h1>
         </div>
       </div>
+      <div className=" p-5 rounded-lg bg-yellow-100 border-2 border-yellow-300">
+        <div className=" gap-2 flex items-center">
+          <div className="rounded-lg bg-yellow-500 text-white p-3">
+            <CiMoneyCheck1 className="text-4xl" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-700">Total Subscribers</h3>
+        </div>
+        <div className="space-y-2 flex items-center gap-2 mt-3">
+          <h1 className="text-4xl font-semibold text-gray-800">{data?.totalNumberOfUser || "369"}</h1>
+          <h1 className="text-sm text-gray-500">Last month total  1050</h1>
+        </div>
+      </div>
+
+
+
+
     </div>
   );
 };

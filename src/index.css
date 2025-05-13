@@ -17,26 +17,34 @@
 /* Custom scrollbar for sidebar with a minimal and modern design */
 .sidebar {
   overflow-y: scroll;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #202020 transparent; /* Scrollbar thumb and track colors */
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: #202020 transparent;
+  /* Scrollbar thumb and track colors */
 }
 
 .sidebar::-webkit-scrollbar {
-  width: 6px; /* Narrower scrollbar width for a sleek look */
+  width: 6px;
+  /* Narrower scrollbar width for a sleek look */
 }
 
 .sidebar::-webkit-scrollbar-track {
-  background: transparent; /* Transparent background for minimalism */
+  background: transparent;
+  /* Transparent background for minimalism */
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  background-color: #888888; /* Thumb color */
-  border-radius: 50px; /* Rounded thumb for a smooth look */
-  border: 2px solid transparent; /* Adds space between thumb and track */
+  background-color: #888888;
+  /* Thumb color */
+  border-radius: 50px;
+  /* Rounded thumb for a smooth look */
+  border: 2px solid transparent;
+  /* Adds space between thumb and track */
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background-color: #555555; /* Darker thumb on hover */
+  background-color: #555555;
+  /* Darker thumb on hover */
 }
 
 /* 
@@ -46,6 +54,6 @@
 
 
 
-  .border-shadow{
-    box-shadow: 0px 0px 10px #84df91;
-  }
+.border-shadow {
+  box-shadow: 0px 0px 10px #ffd400;
+}
