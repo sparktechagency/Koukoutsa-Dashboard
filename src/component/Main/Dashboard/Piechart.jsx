@@ -57,7 +57,7 @@ const Piechart = () => {
   };
 
   return (
-    <div className="w-full col-span-full md:col-span-2 bg-white rounded-lg border border-[#FF9800] p-5">
+    <div className="w-full col-span-full md:col-span-2 bg-white rounded-lg border border-primary p-5">
       <div className=""> 
 
         <div className="w-full">
