@@ -1,7 +1,7 @@
 import { IoChevronBack } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill"; // Import React Quill
-import "react-quill/dist/quill.snow.css"; // Import Quill styles
+// import ReactQuill from "react-quill"; // Import React Quill
+// import "react-quill/dist/quill.snow.css"; // Import Quill styles
 import { useState } from "react";
 import { Form, message } from "antd";
 import { useUpdatePrivacyPolicyAllMutation } from "../../redux/features/setting/settingApi"; // ✅ FIXED
