@@ -1,29 +1,36 @@
 import { IoChevronBack } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, message } from "antd";
-// import ReactQuill from "react-quill"; // Import React Quill
-// import "react-quill/dist/quill.snow.css"; // Import Quill styles
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetAllSettingsQuery, useUpdateAboutUsMutation } from "../../redux/features/setting/settingApi";
 
+import { Editor } from "@toast-ui/react-editor";
+import "@toast-ui/editor/dist/toastui-editor.css";
+
 const EditAboutUs = () => {
-  const [updateAboutUs, { isLoading }] = useUpdateAboutUsMutation();
-  const { data: privacyPolicy, isFetching } = useGetAllSettingsQuery();
-  const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [content, setContent] = useState(""); // State for Quill content
+  const navigate = useNavigate();
+  const editorRef = useRef();
 
-  console.log(content);
+  const { data: settingsData, isFetching } = useGetAllSettingsQuery();
+  const [updateAboutUs, { isLoading }] = useUpdateAboutUsMutation();
 
-  // Set default value when API data is available
+  // Set initial content in editor when data arrives
   useEffect(() => {
-    if (privacyPolicy?.aboutUs) {
-      setContent(privacyPolicy.aboutUs);
+    if (settingsData?.aboutUs && editorRef.current) {
+      editorRef.current.getInstance().setHTML(settingsData.aboutUs);
     }
-  }, [privacyPolicy]);
+  }, [settingsData]);
 
   const handleSubmit = async () => {
-    console.log("Updated About Us Content:", content);
+    if (!editorRef.current) return;
+
+    const content = editorRef.current.getInstance().getHTML();
+
+    if (!content || content === "<p><br></p>") {
+      message.error("Please enter About Us content");
+      return;
+    }
 
     try {
       const res = await updateAboutUs({ aboutUs: content }).unwrap();
@@ -32,7 +39,7 @@ const EditAboutUs = () => {
         navigate("/settings/about-us");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       message.error("Failed to update About Us.");
     }
   };
@@ -50,27 +57,14 @@ const EditAboutUs = () => {
       {/* Form Section */}
       <div className="w-full p-6 rounded-lg shadow-md">
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          {/* React Quill for About Us Content */}
-          <Form.Item initialValue={content} name="content">
-            <ReactQuill
-              defaultValue={content}
-              onChange={setContent} // Update state
-              modules={{
-                toolbar: [
-                  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                  [{ font: [] }],
-                  [{ list: "ordered" }, { list: "bullet" }],
-                  ["bold", "italic", "underline", "strike"],
-                  [{ align: [] }],
-                  [{ color: [] }, { background: [] }],
-                  ["blockquote", "code-block"],
-                  ["link", "image", "video"],
-                  [{ script: "sub" }, { script: "super" }],
-                  [{ indent: "-1" }, { indent: "+1" }],
-                  ["clean"],
-                ],
-              }}
-              style={{ height: "300px" }}
+          <Form.Item>
+            <Editor
+              initialValue="<p>Write your About Us content here...</p>"
+              previewStyle="vertical"
+              height="300px"
+              initialEditType="wysiwyg"
+              useCommandShortcut={true}
+              ref={editorRef}
             />
           </Form.Item>
 
@@ -80,7 +74,7 @@ const EditAboutUs = () => {
               type="primary"
               htmlType="submit"
               className="bg-primary text-white px-5 text-xl py-2 rounded-md"
-              loading={isLoading || isFetching} // Show loading state
+              loading={isLoading || isFetching}
             >
               {isLoading || isFetching ? "Updating..." : "Update"}
             </Button>

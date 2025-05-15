@@ -1,19 +1,21 @@
 import { IoChevronBack } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-// import ReactQuill from "react-quill"; // Import React Quill
-// import "react-quill/dist/quill.snow.css"; // Import Quill styles
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Form, message } from "antd";
-import { useUpdatePrivacyPolicyAllMutation } from "../../redux/features/setting/settingApi"; // ✅ FIXED
+import { useUpdatePrivacyPolicyAllMutation } from "../../redux/features/setting/settingApi";
+import { Editor } from "@toast-ui/react-editor";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
 const EditPrivacyPolicy = () => {
   const [form] = Form.useForm();
-  const [content, setContent] = useState(""); // Default content for the privacy policy
-
-  const [updatePrivacyPolicy, { isLoading }] = useUpdatePrivacyPolicyAllMutation(); // ✅ FIXED
   const navigate = useNavigate();
+  const editorRef = useRef();
 
+  const [updatePrivacyPolicy, { isLoading }] = useUpdatePrivacyPolicyAllMutation();
+
+  // No controlled state, get content from editor on submit
   const handleSubmit = async () => {
+    const content = editorRef.current.getInstance().getHTML();
     console.log("Updated Privacy Policy Content:", content);
 
     try {
@@ -22,9 +24,8 @@ const EditPrivacyPolicy = () => {
         message.success(res?.message);
         navigate("/settings/privacy-policy");
       }
-      console.log("Success:", res);
     } catch (error) {
-      console.log("Error updating privacy policy:", error);
+      console.error("Error updating privacy policy:", error);
       message.error("Failed to update privacy policy");
     }
   };
@@ -42,27 +43,15 @@ const EditPrivacyPolicy = () => {
       {/* Form Section */}
       <div className="w-full p-6 rounded-lg shadow-md">
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          {/* React Quill for Privacy Policy Content */}
-          <Form.Item name="content" initialValue={content}>
-            <ReactQuill
-              value={content}
-              onChange={(value) => setContent(value)}
-              modules={{
-                toolbar: [
-                  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                  [{ font: [] }],
-                  [{ list: "ordered" }, { list: "bullet" }],
-                  ["bold", "italic", "underline", "strike"],
-                  [{ align: [] }],
-                  [{ color: [] }, { background: [] }],
-                  ["blockquote", "code-block"],
-                  ["link", "image", "video"],
-                  [{ script: "sub" }, { script: "super" }],
-                  [{ indent: "-1" }, { indent: "+1" }],
-                  ["clean"],
-                ],
-              }}
-              style={{ height: "300px" }}
+          {/* Toast UI Editor */}
+          <Form.Item>
+            <Editor
+              initialValue="<p>Write your privacy policy here...</p>"
+              previewStyle="vertical"
+              height="300px"
+              initialEditType="wysiwyg"
+              useCommandShortcut={true}
+              ref={editorRef}
             />
           </Form.Item>
 
