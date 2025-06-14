@@ -19,7 +19,7 @@ const Users = () => {
 
   const { data } = useGetAllUsersQuery();
   const allUsers = data?.data?.attributes?.users; 
-
+ 
   // Effect to filter data based on searchText and selectedDate
   useEffect(() => {
     if (allUsers) {
