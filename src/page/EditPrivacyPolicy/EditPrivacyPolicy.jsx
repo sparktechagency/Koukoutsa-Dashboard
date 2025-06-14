@@ -1,8 +1,8 @@
 import { IoChevronBack } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Form, message } from "antd";
-import { useUpdatePrivacyPolicyAllMutation } from "../../redux/features/setting/settingApi";
+import { useGetPrivacyPolicyQuery, useUpdatePrivacyPolicyAllMutation } from "../../redux/features/setting/settingApi";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
@@ -11,7 +11,25 @@ const EditPrivacyPolicy = () => {
   const navigate = useNavigate();
   const editorRef = useRef();
 
+  const { data: privacyPolicy, refetch } = useGetPrivacyPolicyQuery();
+
+  const privacyPolicyContent = privacyPolicy?.data?.attributes?.content;
+
   const [updatePrivacyPolicy, { isLoading }] = useUpdatePrivacyPolicyAllMutation();
+
+  // Utility function to convert HTML to plain text
+  const convertHtmlToText = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
+  useEffect(() => {
+    if (privacyPolicyContent) {
+      // Convert HTML content to plain text and set as initial value
+      const plainTextContent = convertHtmlToText(privacyPolicyContent);
+      editorRef.current?.getInstance().setHTML(plainTextContent);
+    }
+  }, [privacyPolicyContent]);
 
   // No controlled state, get content from editor on submit
   const handleSubmit = async () => {
@@ -19,8 +37,9 @@ const EditPrivacyPolicy = () => {
     console.log("Updated Privacy Policy Content:", content);
 
     try {
-      const res = await updatePrivacyPolicy({ privacyPolicy: content }).unwrap();
-      if (res?.success) {
+      const res = await updatePrivacyPolicy({ content }).unwrap();
+      console.log(res);
+      if (res?.code === 200) {
         message.success(res?.message);
         navigate("/settings/privacy-policy");
       }
@@ -46,7 +65,7 @@ const EditPrivacyPolicy = () => {
           {/* Toast UI Editor */}
           <Form.Item>
             <Editor
-              initialValue="<p>Write your privacy policy here...</p>"
+              initialValue={privacyPolicyContent} // Use plain text for initialValue
               previewStyle="vertical"
               height="300px"
               initialEditType="wysiwyg"

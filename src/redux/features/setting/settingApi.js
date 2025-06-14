@@ -10,10 +10,17 @@ const settingApi = baseApi.injectEndpoints({
         providesTags: ["Setting"],
       }),
     }),
+    getPrivacyPolicy: builder.query({
+      query: () => ({
+        url: "/info/get-privacy-policy",
+        method: "GET",
+        providesTags: ["Setting"],
+      }),
+    }),
 
     updatePrivacyPolicyAll: builder.mutation({  // ✅ FIXED: Use mutation instead of query
       query: (data) => ({
-        url: "/general-info/update/privacy-policy",
+        url: "/info/create-privacy-policy",
         method: "POST",
         body: data,
       }),
@@ -65,8 +72,8 @@ const settingApi = baseApi.injectEndpoints({
 
     updateProfile: builder.mutation({
       query: (data) => ({
-        url: "/update-profile",
-        method: "POST",
+        url: "/users/self/update",
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: ["Profile"],
@@ -89,6 +96,7 @@ const settingApi = baseApi.injectEndpoints({
 
 export const {
   useGetAllSettingsQuery,
+  useGetPrivacyPolicyQuery,
   useUpdatePrivacyPolicyAllMutation, // ✅ FIXED: Mutation hook 
   useUpdateTramsAndConditionsAllMutation,
 

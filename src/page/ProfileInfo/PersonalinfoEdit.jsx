@@ -13,22 +13,24 @@ const PersonalinfoEdit = () => {
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const { data: userProfile, isLoading, refetch } = useGetUserProfileQuery();
-    const user = userProfile?.data;
+    const user = userProfile?.data?.attributes?.user;
 
     const [fileList, setFileList] = useState([]);
     const [imageUrl, setImageUrl] = useState(defaultUserImage);
     const [updateImage, setUpdateImage] = useState(null);
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState(""); // Ensure this is a string
 
     // ✅ **Load User Data When API Call Completes**
     useEffect(() => {
         if (user) {
             form.setFieldsValue({
-                name: user.fullName || "",
-                email: user.email || "",
+                name: user?.fullName || "",
+                email: user?.email || "",
             });
-            setPhoneNumber(user.phoneNumber || "");
-            setImageUrl(user.profileImageUrl ? Url + user.profileImageUrl : defaultUserImage);
+
+            // Ensure phoneNumber is a string and in E.164 format
+            setPhoneNumber(user?.phoneNumber ? `+${user?.phoneNumber}` : "");
+            setImageUrl(user?.profileImage ? Url + user?.profileImage : defaultUserImage);
         }
     }, [user, form]);
 
@@ -43,8 +45,6 @@ const PersonalinfoEdit = () => {
     };
 
     // ✅ **Handle Form Submission**
-
-
     const [updateProfile] = useUpdateProfileMutation();
     useEffect(() => {
         refetch();
@@ -53,21 +53,20 @@ const PersonalinfoEdit = () => {
     const handleUpdateProfile = async (values) => {
         const formData = new FormData();
         formData.append("name", values.name);
-        formData.append("phoneNumber", phoneNumber);
+        formData.append("phoneNumber", phoneNumber); // Send phoneNumber as string
+
 
         if (fileList[0]?.originFileObj) {
-            formData.append("imageOfProfile", fileList[0].originFileObj);
+            formData.append("profileImage", fileList[0].originFileObj);
         }
 
         try {
-
             const response = await updateProfile(formData).unwrap();
             console.log(response);
             if (response?.code) {
                 message.success(response?.message);
                 navigate("/settings/personal-info");
             }
-
         } catch (error) {
             console.error("Error updating profile:", error);
         }
@@ -122,7 +121,7 @@ const PersonalinfoEdit = () => {
                                     <PhoneInput
                                         placeholder="Enter phone number"
                                         value={phoneNumber}
-                                        onChange={setPhoneNumber}
+                                        onChange={setPhoneNumber} // Ensure phone number is a string
                                         international
                                         defaultCountry="bd"
                                         className="rounded-lg border-gray-300 py-3 focus:ring-blue-500 focus:border-blue-500 border-2 px-2"

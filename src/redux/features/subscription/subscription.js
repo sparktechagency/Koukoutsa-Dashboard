@@ -5,14 +5,14 @@ const subScriptionApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getSubScription: builder.query({
             query: () => ({
-                url: `/subscription-packages`, // ✅ Fixed API URL
+                url: `/subscription`, // ✅ Fixed API URL
                 method: "GET",
             }),
             providesTags: ["Subscription"],
         }),
         createSubScription: builder.mutation({
             query: (formData) => ({
-                url: `/subscription/add`, // ✅ Fixed API URL
+                url: `/subscription`, // ✅ Fixed API URL
                 method: "POST",
                 body: formData,
 
@@ -20,18 +20,18 @@ const subScriptionApi = baseApi.injectEndpoints({
             invalidatesTags: ["Subscription"],
         }),
         updateScription: builder.mutation({
-            query: (formData) => ({
-                url: `/subscription/edit`, // ✅ Fixed API URL
-                method: "POST",
-                body: formData,
+            query: ({ id, data }) => ({
+                url: `/subscription/${id}`, // ✅ Fixed API URL
+                method: "PATCH",
+                body: data,
             }),
             invalidatesTags: ["Subscription"],
         }),
 
         deleteSubScription: builder.mutation({
             query: (id) => ({
-                url: `/subscription/delete/${id}`, // ✅ Fixed API URL
-                method: "POST",
+                url: `/subscription/${id}`, // ✅ Fixed API URL
+                method: "DELETE",
             }),
             invalidatesTags: ["Subscription"],
         }),

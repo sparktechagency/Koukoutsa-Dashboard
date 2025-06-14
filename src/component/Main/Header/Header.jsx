@@ -10,13 +10,20 @@ import { MdNotificationsNone } from "react-icons/md";
 import { useGetUserProfileQuery } from "../../../redux/features/setting/settingApi";
 import { useEffect } from "react";
 import Url from "../../../redux/baseApi/forImageUrl";
+import { useGetNotificationQuery } from "../../../redux/features/notificaiton/notification";
 
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
 
   const { data: userProfile, refetch } = useGetUserProfileQuery();
 
-  const user = userProfile?.data;
+  const { data } = useGetNotificationQuery();
+  const allNotifications = data?.data?.attributes?.notifications?.filter((notification) => notification.status == "unread") || [];
+
+
+
+
+  const user = userProfile?.data?.attributes?.user;
   // console.log(user);
 
   useEffect(() => {
@@ -40,17 +47,17 @@ const Header = ({ toggleSidebar }) => {
         <Link to={"/notification"}>
           <h1 className="relative text-primary p-2 rounded-full bg-white">
             <MdNotificationsNone className="size-8" />{" "}
-            {/* <span className="absolute top-0 right-0 w-5 h-5 text-white text-xs flex justify-center items-center bg-red-500 rounded-full">99+</span> */}
+            <span className="absolute top-0 right-0 w-5 h-5 text-white text-xs flex justify-center items-center bg-red-500 rounded-full">{allNotifications?.length}</span>
           </h1>
 
         </Link>
         <img
-          className="w-12 rounded-full"
-          src={user?.profileImageUrl ? Url + user?.profileImageUrl : userImage}
+          className="w-12 h-12 rounded-full"
+          src={user?.profileImage ? Url + user?.profileImage : userImage}
           alt="User Profile"
         />
         <div className="hidden md:block">
-          <h1 className="">{user?.fullName}</h1>
+          <h1 className="">{user?.fullName || "N/A"}</h1>
           <span className="">{user?.role}</span>
         </div>
       </div>

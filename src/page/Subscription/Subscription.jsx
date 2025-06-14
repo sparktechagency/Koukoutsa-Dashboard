@@ -1,95 +1,75 @@
-import React, { useState } from "react";
-import { Modal, Input, message } from "antd";
-import { FaPlus, FaCheckCircle } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Modal, Input, message, Button } from "antd";
+import { FaPlus, FaCheckCircle, FaTrashAlt } from "react-icons/fa";
+import { useCreateSubScriptionMutation, useDeleteSubScriptionMutation, useGetSubScriptionQuery, useUpdateScriptionMutation } from "../../redux/features/subscription/subscription";
 
 const Subscription = () => {
-  const initialSubscriptions = [
-    {
-      id: "4",
-      name: "Premium Plan",
-      price: "20.99",
-      details: `Limited profile views per day
-Limited voice notes and message
-Standard verification process`,
-      duration: "3 Month",
-      condition: "Premium",
-      discount: "N/A",
-    },
-    {
-      id: "1",
-      name: "Basic Plan",
-      price: "9.99",
-      details: `Access to basic features
-Limited support`,
-      duration: "monthly",
-      condition: "Standard",
-      discount: "5%",
-    },
-    {
-      id: "2",
-      name: "Pro Plan",
-      price: "29.99",
-      details: `Full access to all features
-Priority support`,
-      duration: "monthly",
-      condition: "Standard",
-      discount: "10%",
-    },
-  ];
+  const { data, isLoading, isError } = useGetSubScriptionQuery();
+  const [addSubscription, { isLoading: isAdding }] = useCreateSubScriptionMutation();
+  const [deleteSubscription, { isLoading: isDeleting }] = useDeleteSubScriptionMutation();
+  const [updateSubscription, { isLoading: isUpdating }] = useUpdateScriptionMutation();
 
-  const [subscriptions, setSubscriptions] = useState(initialSubscriptions);
 
+  const allSubscriptions = data?.data?.attributes || [];
+  // console.log(allSubscriptions);
+
+  // Local state to manage subscriptions
+  const [subscriptions, setSubscriptions] = useState(allSubscriptions);
+
+  // Modal and form state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [subscriptionName, setSubscriptionName] = useState("");
+  const [subscriptionTitle, setSubscriptionTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
   const [duration, setDuration] = useState("monthly");
-  const [condition, setCondition] = useState("");
-  const [discount, setDiscount] = useState("");
+  const [features, setFeatures] = useState([]); // Features as an array
+  const [isActive, setIsActive] = useState(true);
   const [editId, setEditId] = useState(null);
+
+  // Update local subscriptions when API data changes
+  useEffect(() => {
+    if (data) {
+      setSubscriptions(data?.data?.attributes);
+    }
+  }, [data]);
 
   const showModal = (edit = false, subscription = null) => {
     setIsEditing(edit);
     setIsModalVisible(true);
+
     if (edit && subscription) {
-      setSubscriptionName(subscription.name);
+      setSubscriptionTitle(subscription.title);
       setPrice(subscription.price);
-      setDescription(subscription.details);
       setDuration(subscription.duration || "monthly");
-      setCondition(subscription.condition);
-      setDiscount(subscription.discount);
-      setEditId(subscription.id);
+      setFeatures(subscription.features || []);
+      setIsActive(subscription.isActive);
+      setEditId(subscription._id);
     } else {
-      setSubscriptionName("");
+      setSubscriptionTitle("");
       setPrice("");
-      setDescription("");
       setDuration("monthly");
-      setCondition("");
-      setDiscount("");
+      setFeatures([]);
+      setIsActive(true);
       setEditId(null);
     }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    setSubscriptionName("");
+    setSubscriptionTitle("");
     setPrice("");
-    setDescription("");
     setDuration("monthly");
-    setCondition("");
-    setDiscount("");
+    setFeatures([]);
+    setIsActive(true);
     setEditId(null);
   };
 
   const validateFields = () => {
     if (
-      !subscriptionName.trim() ||
-      !price.trim() ||
-      !description.trim() ||
-      !condition.trim() ||
-      !discount.trim() ||
-      !duration.trim()
+      !subscriptionTitle.trim() ||
+      !price ||
+      !duration.trim() ||
+      features.length === 0
     ) {
       message.error("Please fill all fields!");
       return false;
@@ -101,46 +81,66 @@ Priority support`,
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateFields()) return;
 
     const newSubscription = {
-      id: Date.now().toString(),
-      name: subscriptionName,
-      price,
-      details: description,
-      duration,
-      condition,
-      discount,
+      title: subscriptionTitle,
+      price: parseFloat(price),
+      duration: duration === "monthly" ? "month" : "year", // Corrected assignment
+      features,
+      isActive
     };
 
-    setSubscriptions((prev) => [...prev, newSubscription]);
-    message.success("Subscription added successfully");
-    handleCancel();
+
+    try {
+
+      const res = await addSubscription(newSubscription);
+
+      if (res?.data?.code == 201) {
+        message.success("Subscription added successfully");
+        handleCancel();
+      }
+
+
+    } catch (error) {
+      console.log(error);
+      message.error("Something went wrong");
+    }
+
+
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     if (!validateFields()) return;
 
-    setSubscriptions((prev) =>
-      prev.map((sub) =>
-        sub.id === editId
-          ? {
-              ...sub,
-              name: subscriptionName,
-              price,
-              details: description,
-              duration,
-              condition,
-              discount,
-            }
-          : sub
-      )
-    );
-    message.success("Subscription updated successfully");
-    handleCancel();
+    const updatedSubscription = {
+      title: subscriptionTitle,
+      price: parseFloat(price),
+      duration,
+      features,
+      isActive,
+    };
+
+
+    try {
+
+      const res = await updateSubscription({ id: editId, data: updatedSubscription });
+      console.log(res);
+      if (res?.data?.code == 200) {
+
+        message.success("Subscription updated successfully");
+        handleCancel();
+      }
+
+
+    } catch (error) {
+      console.log(error);
+    }
+
+
   };
 
   const handleDelete = (id) => {
@@ -150,11 +150,38 @@ Priority support`,
       okType: "danger",
       cancelText: "No",
       onOk() {
-        setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
-        message.success("Subscription deleted");
+        const res = deleteSubscription(id);
+        if (res?.data?.code == 200) {
+          message.success("Subscription deleted successfully");
+          refetch();
+        }
       },
     });
+
+
   };
+
+  // Handle adding a new feature
+  const handleAddFeature = () => {
+    setFeatures((prevFeatures) => [...prevFeatures, ""]);
+  };
+
+  // Handle removing a feature
+  const handleRemoveFeature = (index) => {
+    setFeatures((prevFeatures) => prevFeatures.filter((_, i) => i !== index));
+  };
+
+  // Handle updating the value of a feature
+  const handleFeatureChange = (index, value) => {
+    const updatedFeatures = [...features];
+    updatedFeatures[index] = value;
+    setFeatures(updatedFeatures);
+  };
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error fetching subscriptions.</p>;
+
+  // console.log(subscriptions);
 
   return (
     <section>
@@ -169,28 +196,28 @@ Priority support`,
       </div>
 
       <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-6">
-        {subscriptions.length === 0 && <p>No subscriptions available.</p>}
-        {subscriptions.map((subscription) => (
+        {subscriptions?.length === 0 && <p>No subscriptions available.</p>}
+        {subscriptions?.map((subscription) => (
           <div
-            key={subscription.id}
+            key={subscription._id}
             className="border border-yellow-400 rounded-xl p-6 relative flex flex-col items-center max-w-xs mx-auto"
           >
             {/* Premium badge */}
-            {subscription.condition === "Premium" && (
+            {subscription.isActive && (
               <div className="absolute -top-3 bg-yellow-400 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-md">
-                Premium
+                Active
               </div>
             )}
 
-            {/* Duration */}
-            <h2 className="mt-6 mb-4 text-2xl font-extrabold">{subscription.duration}</h2>
+            {/* Title */}
+            <h2 className="mt-6 mb-4 text-2xl font-extrabold">{subscription.title}</h2>
 
             {/* Divider line */}
             <hr className="border-yellow-400 w-full mb-4" />
 
             {/* Features list */}
             <ul className="mb-6 space-y-2 text-sm text-gray-700">
-              {subscription.details.split("\n").map((feature, i) => (
+              {subscription.features?.map((feature, i) => (
                 <li key={i} className="flex items-center gap-2">
                   <FaCheckCircle className="text-yellow-400" />
                   <span>{feature}</span>
@@ -211,7 +238,7 @@ Priority support`,
             {/* Buttons */}
             <div className="grid grid-cols-2 gap-3 mt-6 w-full">
               <button
-                onClick={() => handleDelete(subscription.id)}
+                onClick={() => handleDelete(subscription._id)}
                 className="py-2 px-4 border border-red-500 text-red-500 rounded hover:bg-red-50 transition"
               >
                 Delete
@@ -237,11 +264,11 @@ Priority support`,
       >
         <form onSubmit={isEditing ? handleUpdate : handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-1 font-semibold">Subscription Name</label>
+            <label className="block mb-1 font-semibold">Subscription Title</label>
             <Input
-              placeholder="Enter subscription name"
-              value={subscriptionName}
-              onChange={(e) => setSubscriptionName(e.target.value)}
+              placeholder="Enter subscription title"
+              value={subscriptionTitle}
+              onChange={(e) => setSubscriptionTitle(e.target.value)}
             />
           </div>
 
@@ -262,38 +289,44 @@ Priority support`,
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
             >
-              <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
-              <option value="3 Month">3 Month</option>
               <option value="yearly">Yearly</option>
             </select>
           </div>
 
           <div className="mb-4">
-            <label className="block mb-1 font-semibold">Condition</label>
-            <Input
-              placeholder="Enter condition"
-              value={condition}
-              onChange={(e) => setCondition(e.target.value)}
-            />
+            <label className="block mb-1 font-semibold">Features</label>
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center space-x-2 mb-2">
+                <Input
+                  placeholder="Enter feature"
+                  value={feature}
+                  onChange={(e) => handleFeatureChange(index, e.target.value)}
+                />
+                <Button
+                  type="danger"
+                  icon={<FaTrashAlt />}
+                  onClick={() => handleRemoveFeature(index)}
+                  size="small"
+                />
+              </div>
+            ))}
+            <Button
+              type="dashed"
+              icon={<FaPlus />}
+              onClick={handleAddFeature}
+              size="small"
+            >
+              Add Feature
+            </Button>
           </div>
 
           <div className="mb-4">
-            <label className="block mb-1 font-semibold">Discount</label>
+            <label className="block mb-1 font-semibold">Active</label>
             <Input
-              placeholder="Enter discount"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block mb-1 font-semibold">Description</label>
-            <Input.TextArea
-              rows={3}
-              placeholder="Enter description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
             />
           </div>
 
