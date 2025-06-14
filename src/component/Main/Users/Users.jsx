@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { ConfigProvider, Table, Form, Input, DatePicker } from "antd";
+import { useState, useEffect } from "react";
+import { ConfigProvider, Table, Form, Input, DatePicker, Modal } from "antd";
 import moment from "moment";
 import { IoIosSearch } from "react-icons/io";
 import { FaAngleLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { GoInfo } from "react-icons/go";
+import { useGetAllUsersQuery } from "../../../redux/features/user/userApi";
 
 const { Item } = Form;
 
@@ -12,45 +13,43 @@ const Users = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [dataSource, setDataSource] = useState([]); // ✅ Store filtered data
+  const [dataSource, setDataSource] = useState([]); // Store filtered data
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility
+  const [selectedUser, setSelectedUser] = useState(null); // Store selected user
 
-  // Static demo data for the table
-  const demoData = [
-    {
-      id: 1,
-      fullName: "John Doe",
-      email: "john@example.com",
-      phoneNumber: "123-456-7890",
-      createdAt: "2025-05-01",
-    },
-    {
-      id: 2,
-      fullName: "Jane Smith",
-      email: "jane@example.com",
-      phoneNumber: "987-654-3210",
-      createdAt: "2025-05-02",
-    },
-    {
-      id: 3,
-      fullName: "Alice Johnson",
-      email: "alice@example.com",
-      phoneNumber: "111-222-3333",
-      createdAt: "2025-05-03",
-    },
-    {
-      id: 4,
-      fullName: "Bob Brown",
-      email: "bob@example.com",
-      phoneNumber: "444-555-6666",
-      createdAt: "2025-05-04",
-    },
-    // More users can be added here
-  ];
+  const { data } = useGetAllUsersQuery();
+  const allUsers = data?.data?.attributes?.users;
 
-  // Set the static demo data into state
-  useState(() => {
-    setDataSource(demoData);
-  }, []);
+  // Effect to filter data based on searchText and selectedDate
+  useEffect(() => {
+    if (allUsers) {
+      const filteredUsers = allUsers.filter((user) => {
+        const matchesSearchText =
+          user.fullName.toLowerCase().includes(searchText.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchText.toLowerCase());
+
+        const matchesDate =
+          !selectedDate ||
+          moment(user.createdAt).isSame(selectedDate, "day");
+
+        return matchesSearchText && matchesDate;
+      });
+
+      setDataSource(filteredUsers);
+    }
+  }, [searchText, selectedDate, allUsers]);
+
+  // Handle opening modal with user details
+  const handleOpenModal = (user) => {
+    setSelectedUser(user); // Set selected user
+    setIsModalVisible(true); // Show the modal
+  };
+
+  // Handle closing the modal
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedUser(null); // Clear selected user
+  };
 
   // Columns configuration for the table
   const columns = [
@@ -62,7 +61,10 @@ const Users = () => {
     },
     { title: "Full Name", dataIndex: "fullName", key: "fullName" },
     { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Phone Number", dataIndex: "phoneNumber", key: "phoneNumber" },
+    {
+      title: "Phone Number", dataIndex: "phoneNumber", key: "phoneNumber",
+      render: (text) => <span>{text || "N/A"}</span>
+    },
     {
       title: "Joined Date",
       dataIndex: "createdAt",
@@ -73,9 +75,9 @@ const Users = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Link to={`/users/${record.id}`}>
-          <GoInfo className="text-2xl" />
-        </Link>
+        <button onClick={() => handleOpenModal(record)} className="text-2xl">
+          <GoInfo />
+        </button>
       ),
     },
   ];
@@ -133,6 +135,26 @@ const Users = () => {
           rowKey="id"
         />
       </ConfigProvider>
+
+      {/* Modal for User Details */}
+      <Modal
+        // title="User Details"
+        visible={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={null} // You can add buttons here if needed
+      >
+        {selectedUser ? (
+          <div className="space-y-5">
+            <p><strong>Full Name:</strong> {selectedUser.fullName}</p>
+            <p><strong>Email:</strong> {selectedUser.email}</p>
+            <p><strong>Phone Number:</strong> {selectedUser.phoneNumber || "N/A"}</p>
+            <p><strong>Joined Date:</strong> {moment(selectedUser.createdAt).format("DD MMM YYYY")}</p>
+            {/* Add any other user details here */}
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </Modal>
     </section>
   );
 };

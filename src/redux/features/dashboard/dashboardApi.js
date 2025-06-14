@@ -2,6 +2,12 @@ import { baseApi } from "../../baseApi/baseApi";
 
 const dashboardApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getDashboardStatusAll: builder.query({
+      query: () => ({
+        url: "/users/dashboard/status",
+        method: "GET",
+      }),
+    }),
     getDashboardStatus: builder.query({
       query: () => ({
         url: "/get-dashboard-data",
@@ -16,8 +22,15 @@ const dashboardApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response) => response,
     }),
+    getAllResentUsers: builder.query({
+      query: () => ({
+        url: "/users/recent/users",
+        method: "GET",
+      }),
+      transformResponse: (response) => response,
+    }),
   }),
 });
 
-export const { useGetDashboardStatusQuery, useGetIncomeRatioQuery } =
+export const { useGetDashboardStatusAllQuery, useGetDashboardStatusQuery, useGetIncomeRatioQuery , useGetAllResentUsersQuery } =
   dashboardApi;

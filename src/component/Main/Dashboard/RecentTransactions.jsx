@@ -1,14 +1,19 @@
 import { ConfigProvider, Table, Pagination, Space, message, Modal, Button } from "antd";
 import { useState } from "react";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { useGetDashboardStatusQuery } from "../../../redux/features/dashboard/dashboardApi";
+import { useGetAllResentUsersQuery, useGetDashboardStatusQuery } from "../../../redux/features/dashboard/dashboardApi";
 import { useBlockUserMutation, useUnBlockUserMutation } from "../../../redux/features/user/userApi";
+import moment from "moment";
 
 const RecentTransactions = () => {
   const [currentPage, setCurrentPage] = useState(1); // Track the current page
   const [pageSize, setPageSize] = useState(6); // Items per page
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); // Store selected user details
+
+
+  const { data, isLoading } = useGetAllResentUsersQuery();
+  // console.log(data?.data?.attributes);
 
   const [userBlock] = useBlockUserMutation();
   const [userUnBlock] = useUnBlockUserMutation();
@@ -105,18 +110,18 @@ const RecentTransactions = () => {
   ];
 
   // Paginate the raw data
-  const paginatedData = recentUsers.slice(
+  const paginatedData = data?.data?.attributes?.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  const dataSource = paginatedData.map((user, index) => ({
+  const dataSource = paginatedData?.map((user, index) => ({
     key: user.id,
     si: (currentPage - 1) * pageSize + index + 1, // Correct the serial number based on page
     userName: user.fullName,
     email: user.email,
     role: user.role,
-    joinDate: user.createdAt.split(",")[0], // Adjust based on your date format
+    joinDate: moment(user.createdAt).format("DD MMM YYYY"), // Adjust based on your date format
   }));
 
   return (

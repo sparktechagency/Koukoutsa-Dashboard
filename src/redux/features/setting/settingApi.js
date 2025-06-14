@@ -57,7 +57,7 @@ const settingApi = baseApi.injectEndpoints({
 
     getUserProfile: builder.query({
       query: () => ({
-        url: "/get-settings-data",
+        url: "/users/self/in",
         method: "GET",
         providesTags: ["Profile"],
       }),
