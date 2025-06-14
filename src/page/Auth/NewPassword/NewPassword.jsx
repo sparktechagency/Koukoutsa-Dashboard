@@ -29,8 +29,8 @@ const NewPassword = () => {
 
     try {
       const res = await resetPassword({
-        jwtToken,
-        newPassword: password
+        email,
+        password
       });
       if (res.error) {
         toast.error(res.error.data.message);

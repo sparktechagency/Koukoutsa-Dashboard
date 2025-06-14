@@ -24,6 +24,7 @@ const ForgetPassword = () => {
       if (res.data) {
         toast.success(res.data.message);
         navigate(`/auth/otp/${values?.email}`);
+        localStorage.setItem("email", values?.email);
       }
     } catch (error) {
       toast.error("Something went wrong");

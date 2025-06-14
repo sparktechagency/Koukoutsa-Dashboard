@@ -1,32 +1,34 @@
 import { IoChevronBack } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
-import CustomButton from "../../utils/CustomButton";
-import { Spin } from "antd"; // Importing Spin
+import { Spin, message } from "antd"; // Importing Spin and message
+import { useGetTermsAndConditionsQuery } from "../../redux/features/setting/settingApi";
 import { useEffect } from "react";
-import { useGetAllSettingsQuery } from "../../redux/features/setting/settingApi";
 
 const TermsconditionPage = () => {
+  // Fetching terms and conditions data using React Query
+  const { data: termsAndConditions, isLoading, isError } = useGetTermsAndConditionsQuery();
 
+  const termsAndConditionsContent = termsAndConditions?.data?.attributes?.content;
 
-  const { data: privacyPolicy, isLoading, refetch } = useGetAllSettingsQuery();
-
-  console.log(privacyPolicy?.termsAndConditions);
-
+  // Handle error state if data fetching fails
   useEffect(() => {
-    refetch();
-  }, []);
+    if (isError) {
+      message.error("Failed to load Terms and Conditions");
+    }
+  }, [isError]);
 
   return (
     <section className="w-full h-full min-h-screen">
+      {/* Header Section */}
       <div className="flex justify-between items-center py-5">
         <Link to="/settings" className="flex gap-4 items-center">
-          <>
-            <IoChevronBack className="text-2xl" />
-          </>
+          <IoChevronBack className="text-2xl" />
           <h1 className="text-2xl font-semibold">Terms of Conditions</h1>
         </Link>
-        <Link to={"/settings/edit-terms-conditions/11"}>
+
+        {/* Dynamic link to the edit page using the ID */}
+        <Link to={`/settings/edit-terms-conditions/${termsAndConditions?.data?.id}`}>
           <button
             className="bg-primary text-white flex items-center gap-2 p-2 rounded-md font-bold"
             border
@@ -42,17 +44,16 @@ const TermsconditionPage = () => {
         <div className="flex justify-center items-center h-screen">
           <Spin size="large" />
         </div>
-      )
-        :
-        (
-          <div className="w-full h-full ml-3">
-            <div dangerouslySetInnerHTML={{ __html: privacyPolicy?.termsAndConditions }} />
-          </div>
-        )
-      }
-
-      {/* Show content if data is available */}
-
+      ) : (
+        <div className="w-full h-full ml-3">
+          {/* Display content if available */}
+          {termsAndConditionsContent ? (
+            <div dangerouslySetInnerHTML={{ __html: termsAndConditionsContent }} />
+          ) : (
+            <p>No Terms and Conditions available.</p> // Fallback message if no content is available
+          )}
+        </div>
+      )}
     </section>
   );
 };

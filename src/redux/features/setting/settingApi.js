@@ -10,6 +10,9 @@ const settingApi = baseApi.injectEndpoints({
         providesTags: ["Setting"],
       }),
     }),
+
+
+
     getPrivacyPolicy: builder.query({
       query: () => ({
         url: "/info/get-privacy-policy",
@@ -27,6 +30,41 @@ const settingApi = baseApi.injectEndpoints({
       invalidatesTags: ["Setting"],
     }),
 
+    getTermsAndConditions: builder.query({
+      query: () => ({
+        url: "/info/get-terms-conditions",
+        method: "GET",
+        providesTags: ["Setting"],
+      }),
+    }),
+
+    updateTramsAndConditionsAll: builder.mutation({  // ✅ FIXED: Use mutation instead of query
+      query: (data) => ({
+        url: "/info/create-terms-conditions",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Setting"],
+    }),
+    getAboutUs: builder.query({
+      query: () => ({
+        url: "/info/get-about",
+        method: "GET",
+        providesTags: ["Setting"],
+      }),
+    }),
+    updateAboutUs: builder.mutation({  // ✅ FIXED: Use mutation instead of query
+      query: (data) => ({
+        url: "/info/create-about",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Setting"],
+    }),
+
+
+
+
 
     addFaqMain: builder.mutation({  // ✅ FIXED: Use mutation instead of query
       query: (data) => ({
@@ -43,24 +81,6 @@ const settingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Setting"],
     }),
-
-    updateTramsAndConditionsAll: builder.mutation({  // ✅ FIXED: Use mutation instead of query
-      query: (data) => ({
-        url: "/general-info/update/terms-and-conditions",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Setting"],
-    }),
-    updateAboutUs: builder.mutation({  // ✅ FIXED: Use mutation instead of query
-      query: (data) => ({
-        url: "/general-info/update/about-us",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Setting"],
-    }),
-
 
     getUserProfile: builder.query({
       query: () => ({
@@ -97,6 +117,11 @@ const settingApi = baseApi.injectEndpoints({
 export const {
   useGetAllSettingsQuery,
   useGetPrivacyPolicyQuery,
+
+
+
+  useGetTermsAndConditionsQuery,
+  useGetAboutUsQuery,
   useUpdatePrivacyPolicyAllMutation, // ✅ FIXED: Mutation hook 
   useUpdateTramsAndConditionsAllMutation,
 

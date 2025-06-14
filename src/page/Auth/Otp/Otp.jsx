@@ -14,13 +14,14 @@ const Otp = () => {
   const [forgotPassword] = useForgotPasswordMutation();
   const [verifyOtp, { isLoading }] = useVerifyEmailMutation();
 
+
   const handleOtpChange = (otpValue) => {
     setOtp(otpValue);
   };
 
   const handleMatchOtp = async () => {
     try {
-      const res = await verifyOtp({ otp }).unwrap();
+      const res = await verifyOtp({ code: otp, email }).unwrap();
       if (res.error) {
         toast.error(res?.error?.data?.message);
       }

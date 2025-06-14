@@ -4,20 +4,22 @@ import { Link } from "react-router-dom";
 import { Spin } from "antd"; // Importing Spin
 import { useGetPrivacyPolicyQuery } from "../../redux/features/setting/settingApi";
 
-const PrivacyPolicyPage = () => {
+// Decode HTML entities to actual HTML
+const decodeHtmlEntities = (html) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.documentElement.textContent;
+};
 
+const PrivacyPolicyPage = () => {
   const { data: privacyPolicy, isLoading } = useGetPrivacyPolicyQuery();
 
   const privacyPolicyContent = privacyPolicy?.data?.attributes?.content;
 
-  // Function to convert HTML to plain text
-  const convertHtmlToText = (html) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || ""; // Get text content, stripping HTML tags
-  };
+  // Debugging: Log the raw content to see if it's HTML entities
+  console.log("Privacy Policy Content (Raw):", privacyPolicyContent);
 
-  // Convert HTML content to plain text if it exists
-  const plainTextContent = privacyPolicyContent ? convertHtmlToText(privacyPolicyContent) : '';
+  // Decode HTML entities first, then render HTML content
+  const decodedContent = privacyPolicyContent ? decodeHtmlEntities(privacyPolicyContent) : "";
 
   return (
     <section className="w-full h-full min-h-screen">
@@ -41,9 +43,9 @@ const PrivacyPolicyPage = () => {
         </div>
       ) : (
         <div className="w-full h-full ml-3">
-          {/* Display Privacy Policy Content as Plain Text */}
-          {plainTextContent ? (
-            <div>{plainTextContent}</div> // Only plain text is rendered, no HTML tags
+          {/* Display Privacy Policy Content with HTML formatting */}
+          {decodedContent ? (
+            <div dangerouslySetInnerHTML={{ __html: decodedContent }} /> // Render HTML content directly
           ) : (
             <p>No privacy policy available.</p> // Optional: Handle case if no content is available
           )}

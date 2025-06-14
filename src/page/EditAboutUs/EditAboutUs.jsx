@@ -1,40 +1,56 @@
 import { IoChevronBack } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, message } from "antd";
-import { useEffect, useRef, useState } from "react";
-import { useGetAllSettingsQuery, useUpdateAboutUsMutation } from "../../redux/features/setting/settingApi";
-
+import { useEffect, useRef } from "react";
+import { useGetAboutUsQuery, useUpdateAboutUsMutation } from "../../redux/features/setting/settingApi";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
+
+// Utility function to strip HTML tags and return plain text
+const stripHtmlTags = (html) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || ""; // Return only the plain text
+};
 
 const EditAboutUs = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const editorRef = useRef();
 
-  const { data: settingsData, isFetching } = useGetAllSettingsQuery();
+  // Fetch About Us data
+  const { data: aboutUs, isFetching } = useGetAboutUsQuery();
+  const settingsDataContent = aboutUs?.data?.attributes?.content; // Ensure we get only the content
+
+  // Mutation for updating About Us content
   const [updateAboutUs, { isLoading }] = useUpdateAboutUsMutation();
 
-  // Set initial content in editor when data arrives
+  // Set initial content in the editor when data arrives (strip HTML tags)
   useEffect(() => {
-    if (settingsData?.aboutUs && editorRef.current) {
-      editorRef.current.getInstance().setHTML(settingsData.aboutUs);
+    if (settingsDataContent && editorRef.current) {
+      const plainTextContent = stripHtmlTags(settingsDataContent);  // Strip HTML tags
+      editorRef.current.getInstance().setHTML(plainTextContent);  // Set plain text in editor
     }
-  }, [settingsData]);
+  }, [settingsDataContent]);
 
+  // Handle form submission
   const handleSubmit = async () => {
     if (!editorRef.current) return;
 
+    // Get the plain text content from the editor
     const content = editorRef.current.getInstance().getHTML();
 
-    if (!content || content === "<p><br></p>") {
+    // Strip the HTML tags before submitting
+    const plainText = stripHtmlTags(content);
+
+    // Check if the content is empty or just a placeholder
+    if (!plainText || plainText === "") {
       message.error("Please enter About Us content");
       return;
     }
 
     try {
-      const res = await updateAboutUs({ aboutUs: content }).unwrap();
-      if (res?.success) {
+      const res = await updateAboutUs({ content: plainText }).unwrap();
+      if (res?.code === 200) {
         message.success(res?.message);
         navigate("/settings/about-us");
       }
@@ -58,13 +74,13 @@ const EditAboutUs = () => {
       <div className="w-full p-6 rounded-lg shadow-md">
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item>
+            {/* Use the Toast UI Editor */}
             <Editor
-              initialValue="<p>Write your About Us content here...</p>"
               previewStyle="vertical"
               height="300px"
               initialEditType="wysiwyg"
               useCommandShortcut={true}
-              ref={editorRef}
+              ref={editorRef} // Referencing the editor
             />
           </Form.Item>
 
@@ -74,7 +90,7 @@ const EditAboutUs = () => {
               type="primary"
               htmlType="submit"
               className="bg-primary text-white px-5 text-xl py-2 rounded-md"
-              loading={isLoading || isFetching}
+              loading={isLoading || isFetching} // Show loading state when fetching or updating
             >
               {isLoading || isFetching ? "Updating..." : "Update"}
             </Button>
