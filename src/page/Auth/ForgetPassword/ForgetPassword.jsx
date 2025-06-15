@@ -22,7 +22,7 @@ const ForgetPassword = () => {
         console.log(res.error);
       }
       if (res.data) {
-        toast.success(res.data.message);
+        toast.success("Email sent successfully");
         navigate(`/auth/otp/${values?.email}`);
         localStorage.setItem("email", values?.email);
       }

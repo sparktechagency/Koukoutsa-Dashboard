@@ -27,7 +27,7 @@ const Otp = () => {
       }
       if (res) {
         localStorage.setItem("jwtToken", res?.changePasswordToken);
-        toast.success(res?.data?.message);
+        toast.success('Email verified successfully');
         navigate(`/auth/new-password/${email}`);
       }
     } catch (error) {

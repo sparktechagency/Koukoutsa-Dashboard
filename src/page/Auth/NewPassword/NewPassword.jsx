@@ -36,7 +36,7 @@ const NewPassword = () => {
         toast.error(res.error.data.message);
       }
       if (res.data) {
-        toast.success(res.data.message);
+        toast.success('Password updated successfully');
         navigate("/auth/login");
       }
     } catch (error) {
