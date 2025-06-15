@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Pie } from '@ant-design/charts';
 import { Select } from 'antd';
+import { useGetUserAndIncomeQuery } from '../../../redux/features/dashboard/dashboardApi';
 
 // Sample raw data for the months
 const rawData = {
@@ -13,13 +14,18 @@ const Piechart = () => {
   const mainData = rawData[month]; // Get data for the selected month
 
 
+  const { data: response } = useGetUserAndIncomeQuery();
+ 
+  const rawData2 = response?.data?.attributes;
+
+  console.log(rawData2);
+
 
   // Pie chart configuration
   const config = {
     data: [
-      { type: 'Resent-Used', value: 27 },
-      { type: 'Income', value: 25 },
-      { type: 'Total new User', value: 18 }
+      { type: 'Income', value: rawData2?.totalIncome },
+      { type: 'Total User', value: rawData2?.totalUsers },
     ],
     angleField: 'value',
     colorField: 'type',
@@ -30,13 +36,7 @@ const Piechart = () => {
         fontWeight: 'bold',
       },
     },
-    // legend: {
-    //   color: {
-    //     title: false,
-    //     position: 'right',
-    //     rowPadding: 5,
-    //   },
-    // },
+
     annotations: [
       {
         type: 'text',
@@ -58,7 +58,7 @@ const Piechart = () => {
 
   return (
     <div className="w-full col-span-full md:col-span-2 bg-white rounded-lg border border-primary p-5">
-      <div className=""> 
+      <div className="">
 
         <div className="w-full">
           {/* Render the Pie Chart */}

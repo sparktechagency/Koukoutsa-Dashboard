@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useGetIncomeRatioQuery } from "../../../redux/features/dashboard/dashboardApi";
 
 // Custom Tooltip for the AreaChart
 const CustomTooltip = ({ active, payload, label }) => {
@@ -41,26 +42,32 @@ const IncomeGraphChart = () => {
     { month: "Dec", income: 16000 },
   ];
 
+  const { data: response } = useGetIncomeRatioQuery();
+ 
+  const rawData = response?.data?.attributes;
+
+
+
   return (
     <section className="w-full flex items-center justify-center md:col-span-4 bg-white rounded-lg border border-[#ffd400]">
 
 
-      <ResponsiveContainer className="pr-4 h-full" width="100%" height={450}>
+      <ResponsiveContainer className="pr-4 h-auto pb-10" width="100%" height={450}>
         <AreaChart
-          data={data} // Using raw data directly
+          data={rawData} // Using raw data directly
           margin={{
-            top: 5,
-            bottom: 5,
+            top: 1,
+            bottom: 1,
           }}
           className="md:mt-5 md:mb-5"
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
+          {/* <XAxis dataKey="month" /> */}
           <YAxis />
           <Tooltip content={<CustomTooltip />} />
           <Area
             type="monotone"
-            dataKey="income"
+            dataKey="amount"
             stroke="#ffd400"
             fill="#ffd400"
             strokeWidth={2}
