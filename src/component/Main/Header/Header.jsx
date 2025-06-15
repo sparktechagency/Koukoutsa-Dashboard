@@ -44,7 +44,7 @@ const Header = ({ toggleSidebar }) => {
       </div>
 
       <div className="flex justify-between items-center gap-5">
-        <Link to={"/notification"}> 
+        <Link to={"/notification"}>
           <h1 className="relative text-primary p-2 rounded-full bg-white">
             <MdNotificationsNone className="size-8" />{" "}
             <span className="absolute top-0 right-0 w-5 h-5 text-white text-xs flex justify-center items-center bg-red-500 rounded-full">{allNotifications?.length}</span>
@@ -52,7 +52,7 @@ const Header = ({ toggleSidebar }) => {
 
         </Link>
         <Link className="flex items-center gap-2" to={`/settings/personal-info`}>
-          <img
+          <img 
             className="w-12 h-12 rounded-full"
             src={user?.profileImage ? Url + user?.profileImage : userImage}
             alt="User Profile"
