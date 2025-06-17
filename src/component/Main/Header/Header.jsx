@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { useSelector } from "react-redux";
@@ -16,12 +15,8 @@ const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
 
   const { data: userProfile, refetch } = useGetUserProfileQuery();
-
   const { data } = useGetNotificationQuery();
   const allNotifications = data?.data?.attributes?.notifications?.filter((notification) => notification.status == "unread") || [];
-
-
-
 
   const user = userProfile?.data?.attributes?.user;
   // console.log(user);
