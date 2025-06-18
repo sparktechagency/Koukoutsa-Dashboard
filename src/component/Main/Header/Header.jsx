@@ -19,7 +19,7 @@ const Header = ({ toggleSidebar }) => {
   const allNotifications = data?.data?.attributes?.notifications?.filter((notification) => notification.status == "unread") || [];
 
   const user = userProfile?.data?.attributes?.user;
-  // console.log(user);
+  // console.log(user);   
 
   useEffect(() => {
     refetch();
@@ -47,7 +47,7 @@ const Header = ({ toggleSidebar }) => {
 
         </Link>
         <Link className="flex items-center gap-2" to={`/settings/personal-info`}>
-          <img  
+          <img
             className="w-12 h-12 rounded-full"
             src={user?.profileImage ? Url + user?.profileImage : userImage}
             alt="User Profile"
