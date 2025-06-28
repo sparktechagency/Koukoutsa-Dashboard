@@ -10,13 +10,18 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useGetIncomeRatioQuery } from "../../../redux/features/dashboard/dashboardApi";
+import moment from "moment";
 
 // Custom Tooltip for the AreaChart
 const CustomTooltip = ({ active, payload, label }) => {
+  console.log(payload[0]?.payload?.createdAt);
+
+
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip bg-white p-2 border border-gray-300 rounded shadow-lg">
-        <p className="label font-semibold">{`Month: ${label}`}</p>
+        {/* data , month and year  */}
+        <p className="label font-semibold">{`Month: ${moment(payload[0]?.payload?.createdAt).format("D MMM YYYY")}`}</p>
         <p className="intro">{`Total Income: $${payload[0].value.toLocaleString()}`}</p>
       </div>
     );
@@ -43,7 +48,7 @@ const IncomeGraphChart = () => {
   ];
 
   const { data: response } = useGetIncomeRatioQuery();
- 
+
   const rawData = response?.data?.attributes;
 
 

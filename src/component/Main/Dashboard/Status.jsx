@@ -21,7 +21,7 @@ const Status = () => {
         </div>
         <div className="space-y-2 flex items-center gap-2 mt-3">
           <h1 className="text-4xl font-semibold text-gray-800">{mainData?.totalEarnings || "00"} €</h1>
-          
+
         </div>
       </div>
 
