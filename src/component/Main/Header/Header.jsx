@@ -44,7 +44,6 @@ const Header = ({ toggleSidebar }) => {
             <MdNotificationsNone className="size-8" />{" "}
             <span className="absolute top-0 right-0 w-5 h-5 text-white text-xs flex justify-center items-center bg-red-500 rounded-full">{allNotifications?.length}</span>
           </h1>
-
         </Link>
         <Link className="flex items-center gap-2" to={`/settings/personal-info`}>
           <img
